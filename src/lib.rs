@@ -1,7 +1,9 @@
+mod chat;
 mod config;
 mod error;
 pub mod types;
 
+pub use chat::{Chat, Message as ChatMessage};
 pub use config::Config;
 pub use error::Error;
 use types::{Completion, CompletionParams, Model, Models};
@@ -66,6 +68,16 @@ impl OpenAi {
             .send()
             .await?;
         Ok(serde_json::from_str(&res.text().await?).unwrap())
+    }
+
+    pub async fn start_chat(&self, model: &str) -> Chat {
+        Chat::new(
+            model,
+            &self.client,
+            self.api_version,
+            &self.api_endpoint,
+            &self.api_auth_header,
+        )
     }
 }
 

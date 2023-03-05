@@ -9,3 +9,6 @@
 
 # Include source code
 !src/
+
+# Include examples
+!examples/
