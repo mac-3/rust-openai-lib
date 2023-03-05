@@ -107,6 +107,36 @@ impl Chat {
         }
     }
 
+    pub fn instructions<T>(&mut self, message: &[T])
+    where
+        T: AsRef<str>,
+    {
+        let initial_count = self.messages.len();
+        let mut system_flag = false;
+        let mut turn = false;
+        if initial_count == 0 {
+            system_flag = true;
+        } else {
+            let adjusted_count = initial_count - 1;
+            turn = adjusted_count % 2 == 0;
+        }
+
+        let mut iter = message.iter();
+        while let Some(m) = iter.next() {
+            if system_flag {
+                self.messages.push(Message::new("system", m.as_ref()));
+                system_flag = false;
+            } else {
+                if !turn {
+                    self.messages.push(Message::new("user", m.as_ref()));
+                } else {
+                    self.messages.push(Message::new("assistant", m.as_ref()));
+                }
+                turn = !turn;
+            }
+        }
+    }
+
     pub async fn send(&mut self, message: &str) -> Result<String> {
         self.messages.push(Message {
             role: "user".into(),
